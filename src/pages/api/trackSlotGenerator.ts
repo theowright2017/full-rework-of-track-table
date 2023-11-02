@@ -1,4 +1,4 @@
-import { Student } from "./studentGenerator";
+import { Student } from "./redundant/studentGenerator";
 
 export type TrackSlot = {
   id: number;

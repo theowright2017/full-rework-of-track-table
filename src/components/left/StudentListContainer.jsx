@@ -1,7 +1,9 @@
 import React from "react";
 
-const StudentListContainer = () => {
-  return <div>Student List Container</div>;
+import styles from "../../styles/Left.module.css";
+
+const StudentListContainer = (props) => {
+  return <div className={styles.studentList_container}>{props.children}</div>;
 };
 
 export default StudentListContainer;

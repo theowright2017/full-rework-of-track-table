@@ -1,3 +1,20 @@
+--
+
+09:00
+
+Solution to extract track change data from track columns on save
+
+- pass map hook through context from RightContainer
+- each track registers retrieve function to call its
+  state
+- save button calls hooks get method on each track
+  to retrieve all changes
+
+- will then need to merge changed tracks and their
+  track slots with remaining unchanged ones
+
+--- commit
+
 14:08
 
 debugged

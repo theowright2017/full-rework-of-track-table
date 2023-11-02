@@ -2,8 +2,10 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
-import trackGenerator from "./api/trackGenerator";
+import trackGenerator from "./api/redundant/trackGenerator";
 import serialTrackGenerator from "./api/serialTrackGenerator";
+
+import TrackSlotPageView from "./TrackSlotPageView";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -13,10 +15,7 @@ export default function Home() {
   const serialTracks = tracks.map((track) => serialTrackGenerator(track));
 
   console.log("serial tracks::: ", serialTracks);
-  return (
-    <></>
-    // <TrackSlotView />
-  );
+  return <TrackSlotPageView serialTracks={serialTracks} />;
 }
 
 /*

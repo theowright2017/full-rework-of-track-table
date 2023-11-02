@@ -1,30 +1,18 @@
-import studentListGenerator, { Student } from "./studentGenerator";
+import studentListGenerator, { Student } from "./redundant/studentGenerator";
 import mainColumnGenerator from "../../components/table/ColumnGenerator";
-import trackGenerator, { Track } from "./trackGenerator";
+import trackGenerator, { Track } from "./redundant/trackGenerator";
 import trackSlotGenerator, { TrackSlot } from "./trackSlotGenerator";
 
-import { ColumnDef } from "@tanstack/react-table";
-import ColumnGenerator from "../../components/table/ColumnGenerator";
-
 export type SerialTrack = {
-  //   trackIdx: number;
-  //   id: string;
-  //   length: number;
-  //   slot: number;
-  //   students: Student[];
-
   id: number; //track id
-  // key: string;
   idCohort: number; // track id
   idAssessment: number; // track.idAssessment
   name: string; // track.name
   selected: boolean; // figure this out somehow
   maxLength: number; // track.iSlots
   duration: number; // track.duration
-  //   rows: any[]; // taken from each student in the studentIndex
+
   trackSlots: TrackSlot[]; // replaces rows
-  // columnsToShow: ColumnDef<Student, string>[]; // the actual main columns for the tables
-  // panelType: string
 };
 
 /**
@@ -39,7 +27,7 @@ export type SerialTrack = {
  *  - col.duration
  */
 const serialTrackGenerator = (track: Track): SerialTrack => {
-  // return a track slot with rows
+  // return a type SerialTrack that contains track slots derived from the track.studentIndex
 
   const trackslots = track.studentIndex.map((slotWithStudents, index) => {
     return trackSlotGenerator(

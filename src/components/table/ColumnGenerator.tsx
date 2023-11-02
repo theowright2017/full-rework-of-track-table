@@ -1,6 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { Student } from "@/pages/api/studentGenerator";
+import { Student } from "@/pages/api/redundant/studentGenerator";
 
 const columnHelper = createColumnHelper<Student>();
 
