@@ -1,0 +1,32 @@
+@mixin button_format {
+  background: none;
+  border: none;
+}
+
+.popover_close {
+  @include button_format;
+  font-family: inherit;
+  height: 20px;
+  width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  cursor: pointer;
+}
+
+.popover_content {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 7px 0 rgba(0, 0, 0, 0.14), 0 6px 25px 0 rgba(0, 0, 0, 0.14);
+  // min-width: 200px;
+  // min-height: 100px;
+}
+
+.icon_button {
+  @include button_format;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}

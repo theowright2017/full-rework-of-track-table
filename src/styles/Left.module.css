@@ -1,8 +1,12 @@
 .left_container {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   width: 30%;
+  height: 100%;
+
+  background-color: #fafafa;
 
   border: 1px solid blue;
 }

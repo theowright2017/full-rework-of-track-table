@@ -26,10 +26,14 @@ import styles from "../../styles/Table.module.scss";
 import {
   ColumnVisibilityChooser,
   Filter,
+  HeaderCell,
   HeaderValue,
   Resizer,
   SortingCell,
+  TableInfo,
 } from "./TableComponents";
+import SemPopover from "../other/SemPopover";
+import { CloseIconDark } from "@/vectors/TableIcons";
 
 function TableDragFrom() {
   const [data, setData] = useState(() => [...studentListGenerator]);
@@ -66,10 +70,14 @@ function TableDragFrom() {
 
   return (
     <div id={"table-container"}>
-      <ColumnVisibilityChooser table={table} />
+      <div className={styles.title_container}>
+        <h3>Student List</h3>
+        <ColumnVisibilityChooser table={table} />
+      </div>
+
       <div
         className={styles.table_wrap}
-        style={{ width: table.getCenterTotalSize() }}
+        // style={{ width: table.getCenterTotalSize() }}
         suppressHydrationWarning={true}
       >
         <table
@@ -86,7 +94,13 @@ function TableDragFrom() {
                       <div className={styles.inner}>
                         <SortingCell header={header} />
                         {/* <Filter column={header.column} /> */}
-                        <HeaderValue header={header} />
+                        <SemPopover
+                          ariaLabel={"Filter on column"}
+                          popoverTrigger={<HeaderValue header={header} />}
+                          closeIcon={<CloseIconDark />}
+                        >
+                          <Filter header={header} />
+                        </SemPopover>
                       </div>
 
                       <Resizer
@@ -101,9 +115,10 @@ function TableDragFrom() {
               </tr>
             ))}
           </thead>
-          <TableBody table={table} />;
+          <TableBody table={table} />
         </table>
       </div>
+      <TableInfo />
     </div>
   );
 }
@@ -151,26 +166,5 @@ const DraggableRow = (props: DRProps) => {
     <DraggableItem item={props.item} type={TrackDragItemTypes.ITEM}>
       {(drag: ConnectDragSource) => props.children(drag)}
     </DraggableItem>
-  );
-};
-
-interface HCProps {
-  header: Header<Student, unknown>;
-  children: ReactNode;
-}
-const HeaderCell = (props: HCProps) => {
-  const isSorted = props.header.column.getIsSorted();
-  return (
-    <th
-      key={props.header.id}
-      style={{ width: props.header.getSize() }}
-      className={
-        isSorted
-          ? `${styles.header_cell} ${styles.sorted_cell}`
-          : styles.header_cell
-      }
-    >
-      {props.children}
-    </th>
   );
 };

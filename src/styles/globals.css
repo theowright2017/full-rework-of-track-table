@@ -79,6 +79,10 @@
   margin: 0;
 }
 
+html {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
 html,
 body {
   max-width: 100vw;
@@ -116,4 +120,8 @@ a {
 *::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   border-radius: 8px;
+}
+
+p {
+  font-size: 12px;
 }

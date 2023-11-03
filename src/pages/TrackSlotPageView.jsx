@@ -47,7 +47,7 @@ const TrackSlotPageView = ({ serialTracks }) => {
       <LeftContainer>
         <StudentListContainer>
           <StudentListTable />
-          <TableInfoForStudentList />
+          {/* <TableInfoForStudentList /> */}
         </StudentListContainer>
       </LeftContainer>
 

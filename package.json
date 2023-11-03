@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-switch": "^1.0.3",
     "@tanstack/react-table": "^8.10.7",
     "@types/react-table": "^7.7.17",
     "next": "^14.0.1",

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const IconSortAsc = () => (
   <div
@@ -70,4 +71,118 @@ const IconSortNone = () => (
   </div>
 );
 
-export { IconSortAsc, IconSortDesc, IconSortNone };
+const ColumnVisibilityIcon = ({ sFill }) => (
+  <svg
+    className="colChooser"
+    xmlns="http://www.w3.org/2000/svg"
+    width="13"
+    height="22"
+    viewBox="0 0 13 19"
+  >
+    <rect
+      shapeRendering="crispEdges"
+      fill={sFill}
+      y="6"
+      width="3"
+      height="15"
+    />
+    <rect shapeRendering="crispEdges" fill={sFill} width="3" height="4" />
+    <rect
+      shapeRendering="crispEdges"
+      fill={sFill}
+      x="5"
+      y="6"
+      width="3"
+      height="15"
+    />
+    <rect shapeRendering="crispEdges" fill={sFill} x="5" width="3" height="4" />
+    <rect
+      shapeRendering="crispEdges"
+      fill={sFill}
+      x="10"
+      y="6"
+      width="3"
+      height="15"
+    />
+    <rect
+      shapeRendering="crispEdges"
+      fill={sFill}
+      x="10"
+      width="3"
+      height="4"
+    />
+  </svg>
+);
+
+ColumnVisibilityIcon.propTypes = {
+  sFill: PropTypes.string.isRequired,
+};
+
+const CloseIconWhite = () => (
+  <svg
+    // enable-background="new 0 0 100 100"
+    id="Layer_1"
+    version="1.1"
+    // viewBox="0 0 100 100"
+    // xml:space="preserve"
+    xmlns="http://www.w3.org/2000/svg"
+    // xmlns:xlink="http://www.w3.org/1999/xlink"
+  >
+    <polygon
+      // fill="#FFF"
+      points="77.6,21.1 49.6,49.2 21.5,21.1 19.6,23 47.6,51.1 19.6,79.2 21.5,81.1 49.6,53 77.6,81.1 79.6,79.2   51.5,51.1 79.6,23 "
+    />
+  </svg>
+);
+
+const CloseIconWhite2 = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    stroke="#ffffff"
+  >
+    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+    <g
+      id="SVGRepo_tracerCarrier"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    ></g>
+    <g id="SVGRepo_iconCarrier">
+      {" "}
+      <path
+        d="M16 8L8 16M8.00001 8L16 16"
+        stroke="#ffffff"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>{" "}
+    </g>
+  </svg>
+);
+
+const CloseIconDark = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    x="0px"
+    y="0px"
+    width="10px"
+    height="10px"
+    viewBox="0 0 10 10"
+  >
+    <polygon
+      fill="#808080"
+      points="9.7,0 5,4.7 0.3,0 0,0.3 4.7,5 0,9.7 0.3,10 5,5.3 9.7,10 10,9.7 5.3,5 10,0.3 "
+    />
+  </svg>
+);
+
+export {
+  IconSortAsc,
+  IconSortDesc,
+  IconSortNone,
+  ColumnVisibilityIcon,
+  CloseIconWhite,
+  CloseIconDark,
+  CloseIconWhite2,
+};

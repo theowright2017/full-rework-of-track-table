@@ -1,3 +1,4 @@
+import React, { ReactNode, useState } from "react";
 import {
   Column,
   ColumnResizeMode,
@@ -7,9 +8,18 @@ import {
 } from "@tanstack/react-table";
 import { Student } from "@/pages/api/redundant/studentGenerator";
 
-import styles from "../../styles/Table.module.scss";
-import { IconSortAsc, IconSortDesc, IconSortNone } from "@/vectors/TableIcons";
-import React from "react";
+import {
+  CloseIconWhite,
+  CloseIconWhite2,
+  ColumnVisibilityIcon,
+  IconSortAsc,
+  IconSortDesc,
+  IconSortNone,
+} from "@/vectors/TableIcons";
+import SemPopover from "../../components/other/SemPopover";
+import SemSwitch from "../../components/other/SemSwitch";
+
+import styles from "../../styles/TableComponents.module.scss";
 
 const SortingCell = ({ header }: { header: Header<Student, unknown> }) => (
   <div className={styles.sorting_cell}>
@@ -25,21 +35,29 @@ const SortingCell = ({ header }: { header: Header<Student, unknown> }) => (
   </div>
 );
 
-const Filter = ({ column }: { column: Column<Student, unknown> }) => {
+const Filter = ({ header }: { header: Header<Student, unknown> }) => {
   const [value, setValue] = React.useState("");
 
-  return column.getCanFilter() ? (
-    <div className={""}>
-      <input
-        value={value}
-        onChange={(e) => {
-          column.setFilterValue(e.target.value);
-          setValue(e.target.value);
-        }}
-      />
+  return (
+    <div className={styles.filter}>
+      <h5 className={styles.filter_name}>
+        {header.isPlaceholder
+          ? null
+          : flexRender(header.column.columnDef.header, header.getContext())}
+      </h5>
+      <div className={styles.input_container}>
+        <input
+          className={styles.filter_input}
+          value={value}
+          placeholder={"Filter..."}
+          disabled={!header.column.getCanFilter()}
+          onChange={(e) => {
+            header.column.setFilterValue(e.target.value);
+            setValue(e.target.value);
+          }}
+        />
+      </div>
     </div>
-  ) : (
-    <React.Fragment />
   );
 };
 
@@ -70,23 +88,79 @@ const Resizer = (props: ResizeProps) => (
   />
 );
 
-const ColumnVisibilityChooser = ({ table }: { table: Table<Student> }) =>
-  table.getAllLeafColumns().map((column) => {
-    return (
-      <div key={column.id} className="px-1">
-        <label>
-          <input
-            {...{
-              type: "checkbox",
-              checked: column.getIsVisible(),
-              onChange: column.getToggleVisibilityHandler(),
-            }}
-          />{" "}
-          {column.id}
-        </label>
+const ColumnVisibilityTrigger = () => {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <ColumnVisibilityIcon sFill={hover ? "#97B0DD" : "#B0B0B0"} />
+    </div>
+  );
+};
+
+const ColumnVisibilityChooser = ({ table }: { table: Table<Student> }) => (
+  <div>
+    <SemPopover
+      ariaLabel={"Choose columns"}
+      popoverTrigger={<ColumnVisibilityTrigger />}
+      closeIcon={<CloseIconWhite2 />}
+    >
+      <div className={styles.column_vis_body}>
+        <div className={styles.title_bar}>
+          <p className={styles.title}>Select Columns</p>
+        </div>
+        {table.getAllLeafColumns().map((column) => {
+          return (
+            <fieldset key={column.id} className={styles.item}>
+              <label className={styles.item_label} htmlFor={column.id}>
+                {column.id}
+              </label>
+              <input
+                className={styles.item_switch}
+                type={"checkbox"}
+                checked={column.getIsVisible()}
+                onChange={column.getToggleVisibilityHandler()}
+              />
+
+              {/* <label>Off</label> */}
+              {/* <SemSwitch
+              id={column.id}
+              checked={column.getIsVisible()}
+              onChange={column.getToggleVisibilityHandler()}
+            /> */}
+              {/* <label>On</label> */}
+            </fieldset>
+          );
+        })}
       </div>
-    );
-  });
+    </SemPopover>
+  </div>
+);
+
+interface HCProps {
+  header: Header<Student, unknown>;
+  children: ReactNode;
+}
+
+const HeaderCell = (props: HCProps) => {
+  const isSorted = props.header.column.getIsSorted();
+  return (
+    <th
+      key={props.header.id}
+      style={{ width: props.header.getSize() }}
+      className={
+        isSorted
+          ? `${styles.header_cell} ${styles.sorted_cell}`
+          : styles.header_cell
+      }
+    >
+      {props.children}
+    </th>
+  );
+};
 
 const HeaderValue = ({ header }: { header: Header<Student, unknown> }) => (
   <div className={styles.header_value}>
@@ -96,4 +170,35 @@ const HeaderValue = ({ header }: { header: Header<Student, unknown> }) => (
   </div>
 );
 
-export { SortingCell, Filter, Resizer, ColumnVisibilityChooser, HeaderValue };
+interface TIProps {}
+const TableInfo = (props: TIProps) => {
+  return (
+    <div className={styles.info_container}>
+      <div className={styles.left_container}>
+        <div className={styles.info}>
+          <p>23</p>
+          <p>of</p>
+          <p>39</p>
+          <p>Rows</p>
+        </div>
+        <div className={styles.info}>
+          <p>5</p>
+          <p>of</p>
+          <p>5</p>
+          <p>Cols</p>
+        </div>
+      </div>
+      <div className={styles.right_container}></div>
+    </div>
+  );
+};
+
+export {
+  SortingCell,
+  Filter,
+  Resizer,
+  ColumnVisibilityChooser,
+  HeaderValue,
+  HeaderCell,
+  TableInfo,
+};
