@@ -6,17 +6,19 @@ export type Student = {
   campus: string;
 };
 
-const studentListGenerator = () => {
-  return Array.from({ length: 50 }, (_, idx) => idx).map((index) => {
+const studentListGenerator = (): Student[] => {
+  const items = Array.from({ length: 10 }, (_, idx) => idx).map((index) => {
     const student: Student = {
       id: index,
-      name: `Thomas Crawley ${index}`,
-      code: "DF1223",
-      course: "Engineering",
-      campus: "Bristol",
+      name: index % 2 === 0 ? "Tom Crawley" : "Ben Kingsley",
+      code: index % 2 === 0 ? "XS123" : "AB5676",
+      course: index % 2 === 0 ? "Engineering" : "Humanities",
+      campus: index % 2 === 0 ? "Bristol" : "Edinburgh",
     };
     return student;
   });
+
+  return items;
 };
 
 export default studentListGenerator();

@@ -11,17 +11,17 @@ const mainColumnGenerator = () => [
   }),
   columnHelper.accessor("name", {
     id: "name",
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => info.getValue(),
     header: () => <div>Name</div>,
   }),
   columnHelper.accessor("course", {
     id: "course",
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => info.getValue(),
     header: () => <div>Course</div>,
   }),
   columnHelper.accessor("campus", {
     id: "campus",
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => info.getValue(),
     header: () => <div>Campus</div>,
   }),
 ];
