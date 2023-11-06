@@ -21,7 +21,7 @@ import SemSwitch from "../../components/other/SemSwitch";
 
 import styles from "../../styles/TableComponents.module.scss";
 
-const SortingCell = ({ header }: { header: Header<Student, unknown> }) => (
+const SortingCell = <T,>({ header }: { header: Header<T, unknown> }) => (
   <div className={styles.sorting_cell}>
     <div
       className={styles.sort}
@@ -35,7 +35,7 @@ const SortingCell = ({ header }: { header: Header<Student, unknown> }) => (
   </div>
 );
 
-const Filter = ({ header }: { header: Header<Student, unknown> }) => {
+const Filter = <T,>({ header }: { header: Header<T, unknown> }) => {
   const [value, setValue] = React.useState("");
 
   return (
@@ -61,13 +61,13 @@ const Filter = ({ header }: { header: Header<Student, unknown> }) => {
   );
 };
 
-interface ResizeProps {
-  table: Table<Student>;
-  header: Header<Student, unknown>;
+interface ResizeProps<T> {
+  table: Table<T>;
+  header: Header<T, unknown>;
   columnResizeMode: ColumnResizeMode;
   resizer: string;
 }
-const Resizer = (props: ResizeProps) => (
+const Resizer = <T,>(props: ResizeProps<T>) => (
   <div
     {...{
       onMouseDown: props.header.getResizeHandler(),
@@ -101,7 +101,7 @@ const ColumnVisibilityTrigger = () => {
   );
 };
 
-const ColumnVisibilityChooser = ({ table }: { table: Table<Student> }) => (
+const ColumnVisibilityChooser = <T,>({ table }: { table: Table<T> }) => (
   <div>
     <SemPopover
       ariaLabel={"Choose columns"}
@@ -124,14 +124,6 @@ const ColumnVisibilityChooser = ({ table }: { table: Table<Student> }) => (
                 checked={column.getIsVisible()}
                 onChange={column.getToggleVisibilityHandler()}
               />
-
-              {/* <label>Off</label> */}
-              {/* <SemSwitch
-              id={column.id}
-              checked={column.getIsVisible()}
-              onChange={column.getToggleVisibilityHandler()}
-            /> */}
-              {/* <label>On</label> */}
             </fieldset>
           );
         })}
@@ -140,12 +132,12 @@ const ColumnVisibilityChooser = ({ table }: { table: Table<Student> }) => (
   </div>
 );
 
-interface HCProps {
-  header: Header<Student, unknown>;
+interface HCProps<T> {
+  header: Header<T, unknown>;
   children: ReactNode;
 }
 
-const HeaderCell = (props: HCProps) => {
+const HeaderCell = <T,>(props: HCProps<T>) => {
   const isSorted = props.header.column.getIsSorted();
   return (
     <th
@@ -162,7 +154,7 @@ const HeaderCell = (props: HCProps) => {
   );
 };
 
-const HeaderValue = ({ header }: { header: Header<Student, unknown> }) => (
+const HeaderValue = <T,>({ header }: { header: Header<T, unknown> }) => (
   <div className={styles.header_value}>
     {header.isPlaceholder
       ? null

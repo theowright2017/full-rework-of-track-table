@@ -1,5 +1,9 @@
-import React, { ReactNode, useState } from "react";
-import { ConnectDragSource } from "react-dnd";
+import React, {
+  useState,
+  ComponentPropsWithoutRef,
+  ComponentPropsWithRef,
+  forwardRef,
+} from "react";
 
 import {
   flexRender,
@@ -9,18 +13,9 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   Table,
-  Row,
   ColumnFiltersState,
-  Header,
+  ColumnDef,
 } from "@tanstack/react-table";
-
-import { DraggableItem } from "../../components/dragAndDrop/DraggableItem";
-import { TrackDragItemTypes } from "../../components/dragAndDrop/itemTypes";
-
-import studentListGenerator, {
-  Student,
-} from "../../pages/api/redundant/studentGenerator";
-import mainColumnGenerator from "../../components/table/ColumnGenerator";
 
 import styles from "../../styles/Table.module.scss";
 import {
@@ -35,11 +30,20 @@ import {
 import SemPopover from "../other/SemPopover";
 import { CloseIconDark } from "@/vectors/TableIcons";
 
-function TableDragFrom() {
-  const [data, setData] = useState(() => [...studentListGenerator]);
+interface TableProps2<T extends Record<string, any>> {
+  data: T[];
+  columns: ColumnDef<T, string>[];
+  children: (table: Table<T>) => React.JSX.Element;
+  title: string;
+  filtering?: boolean;
+  sorting?: boolean;
+}
 
-  const [columns] = React.useState<typeof mainColumnGenerator>(() => [
-    ...mainColumnGenerator,
+function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
+  const [data, setData] = useState(() => [...props.data]);
+
+  const [columns] = React.useState<typeof props.columns>(() => [
+    ...props.columns,
   ]);
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -47,8 +51,6 @@ function TableDragFrom() {
   );
 
   const [columnVisibility, setColumnVisibility] = React.useState({});
-
-  //   const [sorting, setSorting] = useState<SortingState>([]);
 
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
@@ -71,7 +73,7 @@ function TableDragFrom() {
   return (
     <div id={"table-container"}>
       <div className={styles.title_container}>
-        <h3>Student List</h3>
+        <h3>{props.title}</h3>
         <ColumnVisibilityChooser table={table} />
       </div>
 
@@ -92,15 +94,19 @@ function TableDragFrom() {
                   return (
                     <HeaderCell header={header}>
                       <div className={styles.inner}>
-                        <SortingCell header={header} />
+                        {props.sorting && <SortingCell header={header} />}
                         {/* <Filter column={header.column} /> */}
-                        <SemPopover
-                          ariaLabel={"Filter on column"}
-                          popoverTrigger={<HeaderValue header={header} />}
-                          closeIcon={<CloseIconDark />}
-                        >
-                          <Filter header={header} />
-                        </SemPopover>
+                        {props.filtering ? (
+                          <SemPopover
+                            ariaLabel={"Filter on column"}
+                            popoverTrigger={<HeaderValue header={header} />}
+                            closeIcon={<CloseIconDark />}
+                          >
+                            <Filter header={header} />
+                          </SemPopover>
+                        ) : (
+                          <HeaderValue header={header} />
+                        )}
                       </div>
 
                       <Resizer
@@ -115,7 +121,7 @@ function TableDragFrom() {
               </tr>
             ))}
           </thead>
-          <TableBody table={table} />
+          {props.children(table)}
         </table>
       </div>
       <TableInfo />
@@ -123,48 +129,37 @@ function TableDragFrom() {
   );
 }
 
-interface TableProps {
-  table: Table<Student>;
-}
-
-const TableBody = ({ table }: TableProps) => (
-  <tbody>
-    {table.getRowModel().rows.map((row, rowIndex) => {
-      return (
-        <DraggableRow item={row} key={`${row.id}_${rowIndex}`}>
-          {(drag: ConnectDragSource) => (
-            <tr key={row.id} ref={drag}>
-              {row.getVisibleCells().map((cell, cellIndex) => {
-                const normal =
-                  rowIndex % 2 !== 0 ? styles.alt_cell : styles.normal_cell;
-                const normalOrSorted = cell.column.getIsSorted()
-                  ? styles.sorted_cell
-                  : normal;
-                return (
-                  <td key={cell.id} className={normalOrSorted}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                );
-              })}
-            </tr>
-          )}
-        </DraggableRow>
-      );
-    })}
-  </tbody>
+type TBodyProps = ComponentPropsWithoutRef<"tbody"> & {
+  children: React.JSX.Element[];
+};
+const TableBody = ({ children, ...tableBodyProps }: TBodyProps) => (
+  <tbody {...tableBodyProps}>{children}</tbody>
 );
 
-export default TableDragFrom;
-
-interface DRProps {
-  children: (drag: ConnectDragSource) => JSX.Element;
-  item: Row<Student>;
-}
-
-const DraggableRow = (props: DRProps) => {
-  return (
-    <DraggableItem item={props.item} type={TrackDragItemTypes.ITEM}>
-      {(drag: ConnectDragSource) => props.children(drag)}
-    </DraggableItem>
-  );
+type RowRef = HTMLTableRowElement;
+type TRowProps = ComponentPropsWithRef<"tr"> & {
+  children: React.JSX.Element[];
 };
+
+const TableRow = forwardRef<RowRef, TRowProps>((props, ref) => (
+  <tr ref={ref} {...props}>
+    {props.children}
+  </tr>
+));
+
+type CellRef = HTMLTableCellElement;
+type TCellProps = ComponentPropsWithRef<"td"> & {
+  children: JSX.Element | React.ReactNode;
+};
+
+const TableCell = forwardRef<CellRef, TCellProps>((props, cellRef) => (
+  <td ref={cellRef} {...props}>
+    {props.children}
+  </td>
+));
+
+SemTable.Body = TableBody;
+SemTable.Row = TableRow;
+SemTable.Cell = TableCell;
+
+export default SemTable;
