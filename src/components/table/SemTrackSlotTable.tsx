@@ -30,26 +30,26 @@ import {
 } from "./TableComponents";
 import SemPopover from "../other/SemPopover";
 import { CloseIconDark } from "@/vectors/TableIcons";
+import { StudentWithTrackSlot } from "@/pages/api/trackSlotGenerator";
+import trackColumnGenerator from "../table/TrackColumnGenerator";
 
-interface TableProps2<T extends Record<string, any>> {
-  data: T[];
-  columns: ColumnDef<T, string>[];
-  children: (table: Table<T>) => React.JSX.Element;
+export const config = {
+  numStickyCols: 2,
+};
+
+interface TableProps2 {
+  data: StudentWithTrackSlot[];
+  // columns: ColumnDef<StudentWithTrackSlot, string>[];
+  children: (table: Table<StudentWithTrackSlot>) => React.JSX.Element[];
   title: string;
   tableInfo: React.JSX.Element;
-
-  subRows?: boolean;
-  subRowKey?: string;
-
-  filtering?: boolean;
-  sorting?: boolean;
 }
 
-function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
-  const [data, setData] = useState(() => [...props.data]);
+function SemTrackSlotTable(props: TableProps2) {
+  const [data, setData] = useState(props.data);
 
-  const [columns] = React.useState<typeof props.columns>(() => [
-    ...props.columns,
+  const [columns] = React.useState<typeof trackColumnGenerator>(() => [
+    ...trackColumnGenerator,
   ]);
 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -61,12 +61,14 @@ function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
+  console.log("table Data", data);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    // getSortedRowModel: getSortedRowModel(),
+    // getFilteredRowModel: getFilteredRowModel(),
     columnResizeMode,
     state: {
       columnFilters,
@@ -74,12 +76,16 @@ function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
     },
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    getSubRows: props.subRows
-      ? (row) => {
-          return row && props.subRowKey && row[props.subRowKey];
-        }
-      : undefined,
+    getSubRows: (row: StudentWithTrackSlot) => {
+      if (row.students) {
+        console.log("students", row.students);
+        return row.students;
+      }
+      return [];
+    },
   });
+
+  console.log("table", table.getRowModel());
 
   return (
     <div id={"table-container"}>
@@ -93,6 +99,7 @@ function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
         // style={{ width: table.getCenterTotalSize() }}
         suppressHydrationWarning={true}
         style={{
+          width: "400px",
           height: "300px",
         }}
       >
@@ -104,31 +111,27 @@ function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, headerIndex) => {
+                  const notSticky = headerIndex + 1 > config.numStickyCols;
                   return (
-                    <HeaderCell header={header}>
+                    <HeaderCell
+                      header={header}
+                      // style={{ width: notSticky ? "10px" : "50px" }}
+                    >
                       <div className={styles.inner}>
-                        {props.sorting && <SortingCell header={header} />}
                         {/* <Filter column={header.column} /> */}
-                        {props.filtering ? (
-                          <SemPopover
-                            ariaLabel={"Filter on column"}
-                            popoverTrigger={<HeaderValue header={header} />}
-                            closeIcon={<CloseIconDark />}
-                          >
-                            <Filter header={header} />
-                          </SemPopover>
-                        ) : (
-                          <HeaderValue header={header} />
-                        )}
+
+                        <HeaderValue header={header} />
                       </div>
 
-                      <Resizer
-                        table={table}
-                        header={header}
-                        columnResizeMode={columnResizeMode}
-                        resizer={styles.resizer}
-                      />
+                      {notSticky && (
+                        <Resizer
+                          table={table}
+                          header={header}
+                          columnResizeMode={columnResizeMode}
+                          resizer={styles.resizer}
+                        />
+                      )}
                     </HeaderCell>
                   );
                 })}
@@ -144,7 +147,7 @@ function SemTable<T extends Record<string, any>>(props: TableProps2<T>) {
 }
 
 type TBodyProps = ComponentPropsWithoutRef<"tbody"> & {
-  children: React.JSX.Element[];
+  children: React.JSX.Element[] | React.JSX.Element;
 };
 const TableBody = ({ children, ...tableBodyProps }: TBodyProps) => (
   <tbody {...tableBodyProps}>{children}</tbody>
@@ -152,7 +155,7 @@ const TableBody = ({ children, ...tableBodyProps }: TBodyProps) => (
 
 type RowRef = HTMLTableRowElement;
 type TRowProps = ComponentPropsWithRef<"tr"> & {
-  children: React.JSX.Element[];
+  children: React.JSX.Element[] | React.JSX.Element;
 };
 
 const TableRow = forwardRef<RowRef, TRowProps>((props, ref) => (
@@ -172,8 +175,8 @@ const TableCell = forwardRef<CellRef, TCellProps>((props, cellRef) => (
   </td>
 ));
 
-SemTable.Body = TableBody;
-SemTable.Row = TableRow;
-SemTable.Cell = TableCell;
+SemTrackSlotTable.Body = TableBody;
+SemTrackSlotTable.Row = TableRow;
+SemTrackSlotTable.Cell = TableCell;
 
-export default SemTable;
+export default SemTrackSlotTable;

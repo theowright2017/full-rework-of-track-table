@@ -11,6 +11,7 @@ import { ConnectDragSource } from "react-dnd";
 import styles from "../../styles/Table.module.scss";
 import { DraggableItem } from "../dragAndDrop/DraggableItem";
 import { TrackDragItemTypes } from "../dragAndDrop/itemTypes";
+import { TableInfo } from "../table/TableComponents";
 
 const StudentListTable = () => {
   return (
@@ -18,6 +19,7 @@ const StudentListTable = () => {
       data={[...studentListGenerator]}
       columns={[...mainColumnGenerator]}
       title={"Student List"}
+      tableInfo={<TableInfo />}
       filtering={true}
       sorting={true}
     >

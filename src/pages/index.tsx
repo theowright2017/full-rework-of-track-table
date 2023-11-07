@@ -14,7 +14,7 @@ const tracks = trackGenerator;
 export default function Home() {
   const serialTracks = tracks.map((track) => serialTrackGenerator(track));
 
-  console.log("serial tracks::: ", serialTracks);
+  // console.log("serial tracks::: ", serialTracks);
   return <TrackSlotPageView serialTracks={serialTracks} />;
 }
 

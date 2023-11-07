@@ -52,15 +52,16 @@ const TrackSlotPageView = ({ serialTracks }) => {
       </LeftContainer>
 
       <RightContainer>
+        {/* right container needs to deal with track selections */}
         <TrackColumnContainer>
           <TrackList />
           <SaveDeleteDropArea />
         </TrackColumnContainer>
 
-        <SelectedTracksContainer>
+        <SelectedTracksContainer selectedTracks={serialTracks}>
           {(selectedTracks) => {
             return selectedTracks.map((trackCol, idx) => (
-              <SelectedTrackColumn key={idx} trackCol={trackCol} />
+              <SelectedTrackColumn key={idx} selectedTrackCol={trackCol} />
             ));
           }}
         </SelectedTracksContainer>

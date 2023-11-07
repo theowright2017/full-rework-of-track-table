@@ -4,10 +4,11 @@ export type Student = {
   code: string;
   course: string;
   campus: string;
+  noStudent?: boolean;
 };
 
 const studentListGenerator = (): Student[] => {
-  const items = Array.from({ length: 10 }, (_, idx) => idx).map((index) => {
+  const items = Array.from({ length: 50 }, (_, idx) => idx).map((index) => {
     const student: Student = {
       id: index,
       name: index % 2 === 0 ? "Tom Crawley" : "Ben Kingsley",

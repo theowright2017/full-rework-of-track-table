@@ -71,92 +71,13 @@ $table_cell_height: 20px;
 .sticky_cell {
   background: lightcoral;
   /* border: 1px solid grey; */
-  left: 0;
+  // left: 0;
   position: sticky;
-  max-width: 50px;
 }
 
 .empty_row {
   height: 20px;
 }
-
-// .resizer {
-//   position: absolute;
-//   right: 0;
-//   top: 0;
-//   height: 100%;
-//   width: 5px;
-//   background: rgba(0, 0, 0, 0.5);
-//   cursor: col-resize;
-//   user-select: none;
-//   touch-action: none;
-// }
-
-// .resizer.isResizing {
-//   background: blue;
-//   opacity: 1;
-// }
-
-// .resizer {
-//   &:hover {
-//     opacity: 0.5;
-//   }
-// }
-
-// @media (hover: hover) {
-//   .resizer {
-//     opacity: 0;
-//   }
-
-//   *:hover > .resizer {
-//     opacity: 1;
-//   }
-// }
-
-// .resizer {
-//   position: absolute;
-//   right: 0;
-//   top: 0;
-//   height: 100%;
-//   width: 3px;
-//   background: rgba(0, 0, 0, 0.5);
-//   cursor: col-resize;
-//   user-select: none;
-//   touch-action: none;
-// }
-
-// .resizer.isResizing {
-//   background: blue;
-//   opacity: 1;
-// }
-
-// @media (hover: hover) {
-//   .resizer {
-//     opacity: 0;
-//   }
-
-//   *:hover > .resizer {
-//     opacity: 0.5;
-//   }
-// }
-
-// .sorting_cell {
-//   height: 12px;
-//   border-bottom: $table_border;
-
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-
-//   .sort {
-//     cursor: s-resize;
-//     user-select: none;
-//   }
-// }
-
-// .sorting_cell .sort {
-//   /* user-select: none; */
-// }
 
 .table_wrap tr {
   height: $table_cell_height;
@@ -179,21 +100,17 @@ $table_cell_height: 20px;
   }
 }
 
-// .header_cell {
-//   background-color: $header_colour;
+//////////////////////  TRACKS ////////////////////////
 
-//   .inner {
-//     display: flex;
-//     flex-direction: column;
+.table_wrap td {
+  &.can_drop_hover {
+    background-color: green;
+  }
+  &.no_drop_hover {
+    background-color: red;
+  }
+}
 
-//     .header_value {
-//       height: $table_cell_height;
-//       padding-left: 3px;
-//       @include table_cell_format;
-//     }
-//   }
-
-//   &.sorted_cell {
-//     background-color: $sorted_colour;
-//   }
-// }
+.break_slot {
+  background-color: coral;
+}

@@ -1,7 +1,7 @@
 import studentListGenerator, { Student } from "./redundant/studentGenerator";
 import mainColumnGenerator from "../../components/table/ColumnGenerator";
 import trackGenerator, { Track } from "./redundant/trackGenerator";
-import trackSlotGenerator, { TrackSlot } from "./trackSlotGenerator";
+import trackSlotGenerator, { StudentWithTrackSlot } from "./trackSlotGenerator";
 
 export type SerialTrack = {
   id: number; //track id
@@ -12,7 +12,7 @@ export type SerialTrack = {
   maxLength: number; // track.iSlots
   duration: number; // track.duration
 
-  trackSlots: TrackSlot[]; // replaces rows
+  trackSlots: StudentWithTrackSlot[]; // replaces rows
 };
 
 /**
@@ -31,7 +31,8 @@ const serialTrackGenerator = (track: Track): SerialTrack => {
 
   const trackslots = track.studentIndex.map((slotWithStudents, index) => {
     return trackSlotGenerator(
-      slotWithStudents[0],
+      slotWithStudents[0] ? slotWithStudents[0] : [],
+      slotWithStudents[0] === null,
       studentListGenerator,
       index,
       index

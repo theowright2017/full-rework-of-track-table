@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, ComponentPropsWithoutRef } from "react";
 import {
   Column,
   ColumnResizeMode,
@@ -132,10 +132,10 @@ const ColumnVisibilityChooser = <T,>({ table }: { table: Table<T> }) => (
   </div>
 );
 
-interface HCProps<T> {
+type HCProps<T> = ComponentPropsWithoutRef<"th"> & {
   header: Header<T, unknown>;
   children: ReactNode;
-}
+};
 
 const HeaderCell = <T,>(props: HCProps<T>) => {
   const isSorted = props.header.column.getIsSorted();
@@ -148,6 +148,7 @@ const HeaderCell = <T,>(props: HCProps<T>) => {
           ? `${styles.header_cell} ${styles.sorted_cell}`
           : styles.header_cell
       }
+      {...props}
     >
       {props.children}
     </th>
