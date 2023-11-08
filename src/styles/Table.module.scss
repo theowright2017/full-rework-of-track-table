@@ -100,6 +100,11 @@ $table_cell_height: 20px;
   }
 }
 
+.table_header_row {
+  position: sticky;
+  top: 0;
+}
+
 //////////////////////  TRACKS ////////////////////////
 
 .table_wrap td {
@@ -113,4 +118,12 @@ $table_cell_height: 20px;
 
 .break_slot {
   background-color: coral;
+}
+
+.table_wrap {
+  &.tracks {
+    // @extend .table_wrap;
+    width: unset !important;
+    height: 80% !important;
+  }
 }

@@ -1,0 +1,13 @@
+.track_list_item {
+  cursor: pointer;
+  background-color: white;
+  border: 10px solid lightgray;
+
+  &.selected {
+    background-color: lightblue;
+  }
+
+  &.no_select {
+    cursor: default;
+  }
+}

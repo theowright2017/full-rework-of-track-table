@@ -25,6 +25,9 @@ import styles from "../styles/TrackView.module.css";
 // );
 
 const TrackSlotPageView = ({ serialTracks }) => {
+  const allTracksinMap = new Map(
+    serialTracks.map((track, index) => [track.id, track])
+  );
   // serial tracks contains trackSlots which contains Students
 
   /*
@@ -52,19 +55,52 @@ const TrackSlotPageView = ({ serialTracks }) => {
       </LeftContainer>
 
       <RightContainer>
-        {/* right container needs to deal with track selections */}
-        <TrackColumnContainer>
-          <TrackList />
-          <SaveDeleteDropArea />
-        </TrackColumnContainer>
+        {(selectedTrackIds, setSelectedTrackIds) => (
+          <>
+            <TrackColumnContainer>
+              <TrackList
+                allTracks={serialTracks}
+                selectedTrackIds={selectedTrackIds}
+                setSelectedTrackIds={setSelectedTrackIds}
+              />
+              <SaveDeleteDropArea />
+            </TrackColumnContainer>
 
-        <SelectedTracksContainer selectedTracks={serialTracks}>
-          {(selectedTracks) => {
-            return selectedTracks.map((trackCol, idx) => (
-              <SelectedTrackColumn key={idx} selectedTrackCol={trackCol} />
-            ));
-          }}
-        </SelectedTracksContainer>
+            <SelectedTracksContainer>
+              {[...selectedTrackIds].map((trackId, idx) => {
+                const selectedTrack = allTracksinMap.get(trackId);
+
+                const trackWidth = () => {
+                  switch (selectedTrackIds.size) {
+                    case 1:
+                      return "100%";
+                    case 2:
+                      return "50%";
+                    case 3:
+                      return "33.3%";
+                    case 4:
+                      return "25%";
+                    case 5:
+                      return "20%";
+                  }
+                };
+                return (
+                  <div
+                    className={styles.selected_track_column}
+                    style={{ width: trackWidth() }}
+                  >
+                    <SelectedTrackColumn
+                      key={idx}
+                      selectedTrackCol={selectedTrack}
+                      multipleSelected={selectedTrackIds.size > 1}
+                    />
+                  </div>
+                );
+              })}
+            </SelectedTracksContainer>
+          </>
+        )}
+        {/* right container needs to deal with track selections */}
       </RightContainer>
     </div>
   );

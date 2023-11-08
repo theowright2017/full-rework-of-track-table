@@ -18,9 +18,10 @@ import { Student } from "@/pages/api/redundant/studentGenerator";
 
 type Props = {
   selectedTrackCol: SerialTrack;
+  multipleSelected: boolean;
 };
 
-const SelectedTrackColumn = ({ selectedTrackCol }: Props) => {
+const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
   const selectedColumnSaveContext = useContext(ColumnSaveContext);
 
   const [trackSlotsMap, setTrackSlotSMap] = useState(
@@ -64,30 +65,48 @@ const SelectedTrackColumn = ({ selectedTrackCol }: Props) => {
     }
   }
 
+  function onChange(value: number, trackSlotRowIdx: number) {
+    let { ...existingSlot } = trackSlotsMap.get(trackSlotRowIdx);
+    if (existingSlot) {
+      existingSlot.length = value;
+    }
+    setTrackSlotSMap((map) => new Map(map.set(trackSlotRowIdx, existingSlot)));
+  }
+
   return (
     <SemTrackSlotTable
       key={Math.random()}
       data={[...trackSlotsMap.values()]}
-      title={"13-1"}
+      title={selectedTrackCol.name}
       tableInfo={<TableInfo />}
     >
       {(table: Table<StudentWithTrackSlot>) => {
-        console.log("table body ROWS:: ", table.getRowModel());
-        return table.getRowModel().rows.map((trackSlot, trackSlotIdx) => {
+        const trackSlotRows = table.getRowModel().rows;
+
+        return trackSlotRows.map((trackSlotRow, trackSlotRowIdx) => {
           const normal =
-            trackSlotIdx % 2 !== 0 ? styles.alt_cell : styles.normal_cell;
+            trackSlotRowIdx % 2 !== 0 ? styles.alt_cell : styles.normal_cell;
+
+          const totalLengthForThisSlot = trackSlotRows
+            .slice(0, trackSlotRowIdx)
+            .reduce((total, row) => total + row.original.length!, 0);
 
           return (
             <SemTrackSlotTable.Body>
-              {trackSlot.original.isBreakSlot ? (
-                <BreakSlot trackSlot={trackSlot} />
+              {trackSlotRow.original.isBreakSlot ? (
+                <BreakSlot
+                  trackSlotRow={trackSlotRow}
+                  length={totalLengthForThisSlot}
+                  onChange={(value: number) => onChange(value, trackSlotRowIdx)}
+                  multipleSelected={multipleSelected}
+                />
               ) : (
-                trackSlot.subRows?.map((subRow, subRowIndex) => {
+                trackSlotRow.subRows?.map((subRow, subRowIndex) => {
                   return (
                     <DragAndDropRow
                       copyOrMove={"copy"}
                       onDrop={(item, copyOrMove) =>
-                        onDrop(item, copyOrMove, trackSlot, subRowIndex)
+                        onDrop(item, copyOrMove, trackSlotRow, subRowIndex)
                       }
                     >
                       {(
@@ -112,17 +131,26 @@ const SelectedTrackColumn = ({ selectedTrackCol }: Props) => {
                                       className={styles.sticky_cell}
                                       style={{ left: "0" }}
                                     >
-                                      <TrackLength />
+                                      <TrackLength
+                                        value={totalLengthForThisSlot}
+                                      />
                                     </SemTrackSlotTable.Cell>
                                   );
-                                case subRowIndex === 0 && cellIndex === 1:
+                                case subRowIndex === 0 &&
+                                  cellIndex === 1 &&
+                                  !multipleSelected:
                                   return (
                                     <SemTrackSlotTable.Cell
                                       rowSpan={3}
                                       className={styles.sticky_cell}
                                       style={{ left: "50px" }}
                                     >
-                                      <TrackInput />
+                                      <TrackInput
+                                        trackSlotRow={trackSlotRow}
+                                        onChange={(value: number) =>
+                                          onChange(value, trackSlotRowIdx)
+                                        }
+                                      />
                                     </SemTrackSlotTable.Cell>
                                   );
                                 case cellIndex < numStickyCols:
@@ -157,16 +185,39 @@ const SelectedTrackColumn = ({ selectedTrackCol }: Props) => {
   );
 };
 
-const TrackLength = () => {
-  return <div>Length</div>;
+const TrackLength = ({ value }: { value: number | undefined }) => {
+  return <div>{`${value ?? "--"} mins`}</div>;
 };
 
-const TrackInput = () => {
-  return <div>Input</div>;
+const TrackInput = ({
+  trackSlotRow,
+  onChange,
+}: {
+  trackSlotRow: Row<StudentWithTrackSlot>;
+  onChange: (value: number) => void;
+}) => {
+  return (
+    <input
+      type={"number"}
+      style={{ width: "90%" }}
+      value={trackSlotRow.original.length}
+      onChange={(e) => onChange(Number(e.target.value))}
+    />
+  );
 };
-const BreakSlot = (props: { trackSlot: Row<StudentWithTrackSlot> }) => (
+const BreakSlot = ({
+  trackSlotRow,
+  length,
+  onChange,
+  multipleSelected,
+}: {
+  trackSlotRow: Row<StudentWithTrackSlot>;
+  length: number;
+  onChange: (value: number) => void;
+  multipleSelected: boolean;
+}) => (
   <SemTrackSlotTable.Row>
-    {props.trackSlot.getVisibleCells().map((breakCell, breakCellIdx) => {
+    {trackSlotRow.getVisibleCells().map((breakCell, breakCellIdx) => {
       switch (true) {
         case breakCellIdx === 0:
           // length cell
@@ -175,18 +226,23 @@ const BreakSlot = (props: { trackSlot: Row<StudentWithTrackSlot> }) => (
               className={styles.sticky_cell}
               style={{ left: 0 }}
             >
-              12
+              {`${length ?? "--"} mins`}
             </SemTrackSlotTable.Cell>
           );
 
-        case breakCellIdx === 1:
+        case breakCellIdx === 1 && !multipleSelected:
           // input cell
           return (
             <SemTrackSlotTable.Cell
               className={styles.sticky_cell}
               style={{ left: 50 }}
             >
-              13
+              <input
+                type={"number"}
+                style={{ width: "90%" }}
+                value={trackSlotRow.original.length}
+                onChange={(e) => onChange(Number(e.target.value))}
+              />
             </SemTrackSlotTable.Cell>
           );
         default:

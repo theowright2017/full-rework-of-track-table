@@ -1,6 +1,6 @@
-import React, { createContext } from "react";
+import React, { createContext, useState } from "react";
 
-import styles from "../styles/Right.module.css";
+import styles from "../styles/Right.module.scss";
 
 /**
  *  - Specifically for extracting track change data on Save
@@ -33,21 +33,13 @@ function useTrackChanges() {
 }
 
 const RightContainer = (props) => {
-  const trackChanges = useTrackChanges();
+  const [selectedTrackIds, setSelectedTrackIds] = useState(new Set());
 
   return (
-    <ColumnSaveContext.Provider value={trackChanges}>
-      <div className={styles.right_container}>{props.children}</div>
-      {/* <button
-        onClick={() => {
-          console.log(
-            "res:: ",
-            trackChanges.getRetrievedDataForId("trackOne")()
-          );
-        }}
-      >
-        SAVE
-      </button> */}
+    <ColumnSaveContext.Provider>
+      <div className={styles.right_container}>
+        {props.children(selectedTrackIds, setSelectedTrackIds)}
+      </div>
     </ColumnSaveContext.Provider>
   );
 };

@@ -6,32 +6,25 @@ import React, {
 } from "react";
 
 import {
-  flexRender,
   getCoreRowModel,
   useReactTable,
   ColumnResizeMode,
-  getFilteredRowModel,
-  getSortedRowModel,
   Table,
   ColumnFiltersState,
-  ColumnDef,
-  Row,
 } from "@tanstack/react-table";
 
-import styles from "../../styles/Table.module.scss";
 import {
   ColumnVisibilityChooser,
   Filter,
   HeaderCell,
   HeaderValue,
   Resizer,
-  SortingCell,
-  TableInfo,
 } from "./TableComponents";
-import SemPopover from "../other/SemPopover";
-import { CloseIconDark } from "@/vectors/TableIcons";
 import { StudentWithTrackSlot } from "@/pages/api/trackSlotGenerator";
 import trackColumnGenerator from "../table/TrackColumnGenerator";
+
+import styles from "../../styles/Table.module.scss";
+import trackTableStyles from "../../styles/TrackTable.module.scss";
 
 export const config = {
   numStickyCols: 2,
@@ -39,7 +32,6 @@ export const config = {
 
 interface TableProps2 {
   data: StudentWithTrackSlot[];
-  // columns: ColumnDef<StudentWithTrackSlot, string>[];
   children: (table: Table<StudentWithTrackSlot>) => React.JSX.Element[];
   title: string;
   tableInfo: React.JSX.Element;
@@ -67,8 +59,6 @@ function SemTrackSlotTable(props: TableProps2) {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    // getSortedRowModel: getSortedRowModel(),
-    // getFilteredRowModel: getFilteredRowModel(),
     columnResizeMode,
     state: {
       columnFilters,
@@ -88,15 +78,14 @@ function SemTrackSlotTable(props: TableProps2) {
   console.log("table", table.getRowModel());
 
   return (
-    <div id={"table-container"}>
+    <div className={trackTableStyles.table_container_tracks}>
       <div className={styles.title_container}>
         <h3>{props.title}</h3>
         <ColumnVisibilityChooser table={table} />
       </div>
 
       <div
-        className={styles.table_wrap}
-        // style={{ width: table.getCenterTotalSize() }}
+        className={`${styles.table_wrap} ${styles.tracks}`}
         suppressHydrationWarning={true}
         style={{
           width: "400px",
@@ -110,17 +99,12 @@ function SemTrackSlotTable(props: TableProps2) {
         >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <tr key={headerGroup.id} className={styles.table_header_row}>
                 {headerGroup.headers.map((header, headerIndex) => {
                   const notSticky = headerIndex + 1 > config.numStickyCols;
                   return (
-                    <HeaderCell
-                      header={header}
-                      // style={{ width: notSticky ? "10px" : "50px" }}
-                    >
+                    <HeaderCell header={header}>
                       <div className={styles.inner}>
-                        {/* <Filter column={header.column} /> */}
-
                         <HeaderValue header={header} />
                       </div>
 

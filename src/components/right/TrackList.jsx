@@ -1,7 +1,41 @@
 import React from "react";
 
-const TrackList = () => {
-  return <div>Track List</div>;
+import styles from "../../styles/TrackComponents.module.scss";
+
+const TrackList = ({ allTracks, selectedTrackIds, setSelectedTrackIds }) => {
+  function selectTrack(track) {
+    if (selectedTrackIds.has(track.id)) {
+      setSelectedTrackIds((prev) => {
+        selectedTrackIds.delete(track.id);
+        return new Set(prev);
+      });
+    } else {
+      setSelectedTrackIds((prev) => new Set([...prev, track.id]));
+    }
+  }
+
+  return [...allTracks.values()].map((track) => (
+    <TrackListItem
+      track={track}
+      isSelected={selectedTrackIds.has(track.id)}
+      selectTrack={selectTrack}
+      noSelect={selectedTrackIds.size === 5 && !selectedTrackIds.has(track.id)}
+    />
+  ));
 };
 
 export default TrackList;
+
+const TrackListItem = ({ track, isSelected, selectTrack, noSelect }) => {
+  const onSelectTrack = noSelect ? undefined : () => selectTrack(track);
+  return (
+    <div
+      onClick={onSelectTrack}
+      className={`${styles.track_list_item} ${
+        isSelected ? styles.selected : ""
+      } ${noSelect ? styles.no_select : ""}`}
+    >
+      <div className={styles.title}>{track.name}</div>
+    </div>
+  );
+};
