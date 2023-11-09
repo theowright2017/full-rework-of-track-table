@@ -13,9 +13,16 @@ export function useTrackChanges() {
     return trackColIdToRetrieveMap.has(trackColId);
   };
 
+  const retrieveAllData = () => {
+    return [...trackColIdToRetrieveMap.values()].map((retrieveFunc) =>
+      retrieveFunc()
+    );
+  };
+
   return {
     setRetrieve,
     getRetrievedDataForId,
     idHasData,
+    retrieveAllData,
   };
 }

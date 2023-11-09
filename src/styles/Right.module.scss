@@ -10,6 +10,7 @@
 .trackList_container {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   width: 20%;
 
@@ -24,4 +25,33 @@
   padding: 0 10px;
 
   border: 1px dashed purple;
+}
+
+.save_delete_area {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+
+  margin: 0 5px;
+  padding-top: 5px;
+  border: {
+    top: 1px solid #dedede;
+    right: 1px solid #dedede;
+    left: 1px solid #dedede;
+  }
+
+  .save {
+    color: #78ad17;
+    border: solid 2px #78ad17;
+    font-weight: 700;
+    cursor: pointer;
+    width: 50px;
+
+    &:hover {
+      background-color: #dedede;
+    }
+  }
+
+  .delete_bin {
+  }
 }

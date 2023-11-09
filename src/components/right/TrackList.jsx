@@ -14,14 +14,20 @@ const TrackList = ({ allTracks, selectedTrackIds, setSelectedTrackIds }) => {
     }
   }
 
-  return [...allTracks.values()].map((track) => (
-    <TrackListItem
-      track={track}
-      isSelected={selectedTrackIds.has(track.id)}
-      selectTrack={selectTrack}
-      noSelect={selectedTrackIds.size === 5 && !selectedTrackIds.has(track.id)}
-    />
-  ));
+  return (
+    <div>
+      {[...allTracks.values()].map((track) => (
+        <TrackListItem
+          track={track}
+          isSelected={selectedTrackIds.has(track.id)}
+          selectTrack={selectTrack}
+          noSelect={
+            selectedTrackIds.size === 5 && !selectedTrackIds.has(track.id)
+          }
+        />
+      ))}
+    </div>
+  );
 };
 
 export default TrackList;

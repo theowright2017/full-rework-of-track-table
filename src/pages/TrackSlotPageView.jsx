@@ -11,7 +11,7 @@ import TableInfoForStudentList from "../components/left/TableInfoForStudentList"
 
 import SaveDeleteDropArea from "../components/right/SaveDeleteDropArea";
 import TrackList from "../components/right/TrackList";
-import TrackColumnContainer from "../components/right/TrackColumnContainer";
+import TrackListContainer from "../components/right/TrackListContainer";
 import SelectedTracksContainer from "../components/right/SelectedTracksContainer";
 import SelectedTrackColumn from "../components/right/SelectedTrackColumn";
 
@@ -47,14 +47,14 @@ const TrackSlotPageView = ({ allTracksinMap }) => {
         <RightContainer>
           {(selectedTrackIds, setSelectedTrackIds) => (
             <>
-              <TrackColumnContainer>
+              <TrackListContainer>
                 <TrackList
                   allTracks={allTracksinMap}
                   selectedTrackIds={selectedTrackIds}
                   setSelectedTrackIds={setSelectedTrackIds}
                 />
                 <SaveDeleteDropArea />
-              </TrackColumnContainer>
+              </TrackListContainer>
 
               <SelectedTracksContainer>
                 {[...allTracksinMap.values()].map((track) => {
