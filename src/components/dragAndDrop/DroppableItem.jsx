@@ -5,7 +5,7 @@ export const DroppableItem = (props) => {
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: props.type,
-      canDrop: () => true, // check not in other cohorts, etc
+      canDrop: () => true,
       drop: (draggedItem, monitor) => {
         props.onDrop(
           draggedItem.item,

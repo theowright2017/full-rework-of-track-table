@@ -6,3 +6,33 @@
 .selected_track_column {
   height: 100%;
 }
+
+.tracks {
+  width: unset !important;
+  height: 80% !important;
+
+  .sticky_cell {
+    position: sticky;
+    cursor: pointer;
+  }
+
+  .slot_row {
+    .alt_cell {
+      background-color: #f3f4f9;
+    }
+    .normal_cell {
+      background-color: #fff;
+    }
+  }
+
+  .can_drop_hover {
+    background-color: green !important;
+  }
+  .no_drop_hover {
+    background-color: red;
+  }
+
+  .selected_track_slot {
+    background-color: lightblue;
+  }
+}

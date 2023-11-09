@@ -163,8 +163,9 @@ const HeaderValue = <T,>({ header }: { header: Header<T, unknown> }) => (
   </div>
 );
 
-interface TIProps {}
-const TableInfo = (props: TIProps) => {
+const TableInfo = (props: {
+  children: React.JSX.Element[] | React.JSX.Element;
+}) => {
   return (
     <div className={styles.info_container}>
       <div className={styles.left_container}>
@@ -181,7 +182,7 @@ const TableInfo = (props: TIProps) => {
           <p>Cols</p>
         </div>
       </div>
-      <div className={styles.right_container}></div>
+      <div className={styles.right_container}>{props.children}</div>
     </div>
   );
 };

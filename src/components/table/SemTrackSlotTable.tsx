@@ -80,7 +80,7 @@ function SemTrackSlotTable(props: TableProps2) {
       </div>
 
       <div
-        className={`${styles.table_wrap} ${styles.tracks}`}
+        className={`${styles.table_wrap} ${trackTableStyles.tracks}`}
         suppressHydrationWarning={true}
         style={{
           width: "400px",

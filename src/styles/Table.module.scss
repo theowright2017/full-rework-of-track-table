@@ -64,17 +64,6 @@ $table_cell_height: 20px;
   }
 }
 
-/* .table_wrap td {
-  border: 0.1px solid rgb(183, 183, 183);
-} */
-
-.sticky_cell {
-  background: lightcoral;
-  /* border: 1px solid grey; */
-  // left: 0;
-  position: sticky;
-}
-
 .empty_row {
   height: 20px;
 }
@@ -86,14 +75,6 @@ $table_cell_height: 20px;
 
 .table_wrap td {
   padding-left: 2px;
-
-  &.alt_cell {
-    background-color: #f3f4f9;
-  }
-
-  &.normal_cell {
-    background-color: #fff;
-  }
 
   &.sorted_cell {
     background-color: $sorted_colour;
@@ -107,23 +88,6 @@ $table_cell_height: 20px;
 
 //////////////////////  TRACKS ////////////////////////
 
-.table_wrap td {
-  &.can_drop_hover {
-    background-color: green;
-  }
-  &.no_drop_hover {
-    background-color: red;
-  }
-}
-
 .break_slot {
   background-color: coral;
-}
-
-.table_wrap {
-  &.tracks {
-    // @extend .table_wrap;
-    width: unset !important;
-    height: 80% !important;
-  }
 }

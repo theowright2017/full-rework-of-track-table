@@ -12,7 +12,6 @@ import { TrackDragItemTypes } from "../dragAndDrop/itemTypes";
 import { DraggableItem } from "../dragAndDrop/DraggableItem";
 import { DroppableItem } from "../dragAndDrop/DroppableItem";
 
-import styles from "../../styles/Table.module.scss";
 import { SerialTrack } from "@/pages/api/serialTrackGenerator";
 import { StudentWithTrackSlot } from "@/pages/api/trackSlotGenerator";
 import SemTrackSlotTable, { config } from "../table/SemTrackSlotTable";
@@ -24,6 +23,15 @@ import {
 import { Student } from "@/pages/api/redundant/studentGenerator";
 
 import { ColumnSaveContextType } from "@/state/typesJstoTs";
+
+import styles from "../../styles/Table.module.scss";
+import trackStyles from "../../styles/TrackTable.module.scss";
+import {
+  WithJustSlots,
+  WithSlotsAndPopover,
+  WithSlotsAndStudents,
+  WithSlotsStudentsAndPopover,
+} from "../table/TrackTableComponents";
 
 type Props = {
   selectedTrackCol: SerialTrack;
@@ -44,6 +52,10 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
       ])
     )
   );
+
+  const [selectedTrackSlot, setSelectedTrackSlot] = useState<
+    number | undefined
+  >(undefined);
 
   selectedColumnSaveContext?.setRetrieve(selectedTrackCol.id, () => {
     return trackSlotsMap;
@@ -112,23 +124,162 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
     setTrackSlotSMap((map) => new Map(map.set(trackSlotRowIdx, existingSlot)));
   }
 
+  const tableInfoButtons = () => {
+    function addSlot() {
+      const newIndex = [...trackSlotsMap.values()].length;
+      setTrackSlotSMap(
+        (map) =>
+          new Map(
+            map.set(newIndex, {
+              id: newIndex.toString(),
+              trackSlotIndex: newIndex,
+              length: 30,
+              students: ["0", "1", "2"].map((studId) => ({
+                // TW - TODO - make this config length of rows per slot
+                id: `empty_row_${studId}`,
+                code: "",
+                name: "",
+                course: "",
+                campus: "",
+              })),
+              isBreakSlot: false,
+              code: "",
+              name: "",
+              course: "",
+              campus: "",
+            })
+          )
+      );
+    }
+    function removeSlot() {
+      console.log("remove");
+      const lastSlot = trackSlotsMap.get(trackSlotsMap.size - 1);
+      const hasStudents = lastSlot?.students?.some((row) => row.code !== "");
+
+      if (hasStudents) {
+        // show and wait for alert
+
+        lastSlot?.students?.forEach((stu) => {
+          if (stu.code !== "") {
+            deleteStudentId(stu.id);
+          }
+        });
+      }
+
+      // TW - need to account for adding break slot, based on config
+      setTrackSlotSMap((map) => {
+        if (!lastSlot?.students?.length) {
+          map.delete(trackSlotsMap.size - 1);
+        }
+        map.delete(trackSlotsMap.size - 1);
+
+        const latestFinalSlot = trackSlotsMap.get(trackSlotsMap.size - 1);
+        if (!latestFinalSlot?.students?.length) {
+          map.delete(trackSlotsMap.size - 1);
+        }
+
+        return new Map(map);
+      });
+    }
+
+    function addStudent() {
+      if (selectedTrackSlot === undefined) {
+        return;
+      }
+
+      const selectedSlot = trackSlotsMap.get(selectedTrackSlot);
+      if (!selectedSlot) {
+        return;
+      }
+
+      selectedSlot?.students?.push({
+        id: selectedSlot?.students?.length.toString(),
+        name: "",
+        course: "",
+        code: "",
+        campus: "",
+      });
+
+      setTrackSlotSMap(
+        (map) => new Map(map.set(selectedTrackSlot, selectedSlot))
+      );
+    }
+    function removeStudent() {
+      console.log("remove student");
+      if (selectedTrackSlot === undefined) {
+        return;
+      }
+      const selectedSlot = trackSlotsMap.get(selectedTrackSlot);
+      if (!selectedSlot) {
+        return;
+      }
+      if (selectedSlot.students?.length === 1) {
+        return; // TW - need to grey -Slot button out ideally
+      }
+
+      if (
+        selectedSlot.students?.[selectedSlot.students.length - 1].code !== ""
+      ) {
+        deleteStudentId(
+          selectedSlot.students?.[selectedSlot.students.length - 1].id
+        );
+      }
+
+      setTrackSlotSMap((map) => {
+        selectedSlot.students?.pop();
+        return new Map(map.set(selectedTrackSlot, selectedSlot));
+      });
+    }
+    function unschedule() {
+      // TW - need to hook up
+    }
+
+    const slotsAndStudentsProps = {
+      addSlot,
+      removeSlot,
+      addStudent,
+      removeStudent,
+    };
+
+    const slotsOnlyProps = {
+      addSlot,
+      removeSlot,
+    };
+    console.log("multiple", multipleSelected);
+    switch (true) {
+      case !multipleSelected && selectedTrackSlot !== undefined:
+        return <WithSlotsAndStudents {...slotsAndStudentsProps} />;
+      case !multipleSelected && selectedTrackSlot === undefined:
+        return <WithJustSlots {...slotsOnlyProps} />;
+      case multipleSelected && selectedTrackSlot !== undefined:
+        return <WithSlotsStudentsAndPopover {...slotsAndStudentsProps} />;
+      case multipleSelected && selectedTrackSlot === undefined:
+        return <WithSlotsAndPopover {...slotsOnlyProps} />;
+      // case isScheduled:
+      //   return <UnscheduleTrack unschedule={unschedule}/>
+    }
+
+    return [<></>];
+  };
+
   return (
     <SemTrackSlotTable
       key={Math.random()}
       data={[...trackSlotsMap.values()]}
       title={selectedTrackCol.name}
-      tableInfo={<TableInfo />}
+      tableInfo={<TableInfo>{tableInfoButtons()}</TableInfo>}
     >
       {(table: Table<StudentWithTrackSlot>) => {
         const trackSlotRows = table.getRowModel().rows;
 
         return trackSlotRows.map((trackSlotRow, trackSlotRowIdx) => {
-          const normal =
-            trackSlotRowIdx % 2 !== 0 ? styles.alt_cell : styles.normal_cell;
-
           const totalLengthForThisSlot = trackSlotRows
             .slice(0, trackSlotRowIdx)
             .reduce((total, row) => total + row.original.length!, 0);
+
+          const trackSlotIsSelected =
+            selectedTrackSlot === trackSlotRowIdx &&
+            trackSlotRow.original.isBreakSlot === false;
 
           return (
             <SemTrackSlotTable.Body key={`rowBody_${trackSlotRow.id}`}>
@@ -170,11 +321,36 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                         canDrop: boolean,
                         drag: ConnectDragSource
                       ) => {
-                        const dropHover = canDrop
-                          ? styles.can_drop_hover
-                          : styles.no_drop_hover;
-
                         const numStickyCols = config.numStickyCols;
+
+                        const selectslotFunc = () =>
+                          setSelectedTrackSlot((prev: number | undefined) =>
+                            prev === trackSlotRowIdx
+                              ? undefined
+                              : trackSlotRowIdx
+                          );
+
+                        let rowCellColour = "";
+                        if (isOver && canDrop) {
+                          rowCellColour = "green";
+                        } else if (isOver && !canDrop) {
+                          rowCellColour = "red";
+                        } else if (trackSlotIsSelected && !isOver) {
+                          rowCellColour = "lightblue";
+                        } else if (trackSlotIsSelected && isOver && canDrop) {
+                          rowCellColour = "green";
+                        } else if (trackSlotIsSelected && isOver && !canDrop) {
+                          rowCellColour = "red";
+                        } else {
+                          rowCellColour = "#fff";
+                        }
+
+                        let stickyCellColour = "";
+                        if (trackSlotIsSelected) {
+                          stickyCellColour = "lightblue";
+                        } else {
+                          stickyCellColour = "#fff";
+                        }
 
                         return (
                           <SemTrackSlotTable.Row
@@ -182,15 +358,20 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                             ref={(el) => {
                               drop(el), drag(el);
                             }}
+                            className={trackStyles.slot_row}
                           >
                             {subRow.getVisibleCells().map((cell, cellIndex) => {
                               switch (true) {
                                 case subRowIndex < 1 && cellIndex === 0:
                                   return (
                                     <SemTrackSlotTable.Cell
-                                      rowSpan={3}
-                                      className={styles.sticky_cell}
-                                      style={{ left: "0" }}
+                                      rowSpan={trackSlotRow.subRows.length}
+                                      className={trackStyles.sticky_cell}
+                                      style={{
+                                        left: "0",
+                                        backgroundColor: stickyCellColour,
+                                      }}
+                                      onClick={() => selectslotFunc()}
                                     >
                                       <TrackLength
                                         value={totalLengthForThisSlot}
@@ -202,9 +383,13 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                                   !multipleSelected:
                                   return (
                                     <SemTrackSlotTable.Cell
-                                      rowSpan={3}
-                                      className={styles.sticky_cell}
-                                      style={{ left: "50px" }}
+                                      rowSpan={trackSlotRow.subRows.length}
+                                      className={trackStyles.sticky_cell}
+                                      style={{
+                                        left: "50px",
+                                        backgroundColor: stickyCellColour,
+                                      }}
+                                      onClick={() => selectslotFunc()}
                                     >
                                       <TrackInput
                                         trackSlotRow={trackSlotRow}
@@ -221,7 +406,9 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                                     <SemTrackSlotTable.Cell
                                       key={cell.id}
                                       id={`cell-${cellIndex}_subR-${subRowIndex}`}
-                                      className={isOver ? dropHover : normal}
+                                      style={{
+                                        backgroundColor: rowCellColour,
+                                      }}
                                     >
                                       {flexRender(
                                         cell.column.columnDef.cell,
@@ -310,7 +497,11 @@ const BreakSlot = ({
             </SemTrackSlotTable.Cell>
           );
         default:
-          return <></>;
+          return (
+            <SemTrackSlotTable.Cell key={`breakCell_${breakCell.id}`}>
+              <></>
+            </SemTrackSlotTable.Cell>
+          );
       }
     })}
   </SemTrackSlotTable.Row>
@@ -395,7 +586,6 @@ const DroppableRow = (props: DropRowProps) => {
     <DroppableItem
       type={TrackDragItemTypes.ITEM}
       dropSourceItem={props.item}
-      // copyOrMove={props.copyOrMove}
       onDrop={props.onDrop}
     >
       {(drop: ConnectDropTarget, isOver: boolean, canDrop: boolean) =>

@@ -177,6 +177,24 @@ const CloseIconDark = () => (
   </svg>
 );
 
+const ButtonMoreIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    x="0px"
+    y="0px"
+    width="3px"
+    height="13px"
+    viewBox="0 0 3 13"
+  >
+    {/* <path fill="#848484" d="M2,4L2,4C0.9,4,0,3.1,0,2v0c0-1.1,0.9-2,2-2h0c1.1,0,2,0.9,2,2v0C4,3.1,3.1,4,2,4z"/>
+					<path fill="#848484" d="M2,10L2,10c-1.1,0-2-0.9-2-2v0c0-1.1,0.9-2,2-2h0c1.1,0,2,0.9,2,2v0C4,9.1,3.1,10,2,10z"/>
+					<path fill="#848484" d="M2,16L2,16c-1.1,0-2-0.9-2-2v0c0-1.1,0.9-2,2-2h0c1.1,0,2,0.9,2,2v0C4,15.1,3.1,16,2,16z"/> */}
+    <circle fill="#848484" cx="1.5" cy="1.5" r="1.5" />
+    <circle fill="#848484" cx="1.5" cy="6.5" r="1.5" />
+    <circle fill="#848484" cx="1.5" cy="11.5" r="1.5" />
+  </svg>
+);
+
 export {
   IconSortAsc,
   IconSortDesc,
@@ -185,4 +203,5 @@ export {
   CloseIconWhite,
   CloseIconDark,
   CloseIconWhite2,
+  ButtonMoreIcon,
 };

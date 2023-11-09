@@ -6,7 +6,7 @@ export function useTrackChanges() {
   };
 
   const getRetrievedDataForId = (trackColId) => {
-    return trackColIdToRetrieveMap.get(trackColId);
+    return trackColIdToRetrieveMap.get(trackColId)?.();
   };
 
   const idHasData = (trackColId) => {
