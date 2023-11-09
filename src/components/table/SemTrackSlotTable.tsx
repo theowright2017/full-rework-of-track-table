@@ -53,8 +53,6 @@ function SemTrackSlotTable(props: TableProps2) {
   const [columnResizeMode, setColumnResizeMode] =
     React.useState<ColumnResizeMode>("onChange");
 
-  console.log("table Data", data);
-
   const table = useReactTable({
     data,
     columns,
@@ -68,14 +66,11 @@ function SemTrackSlotTable(props: TableProps2) {
     onColumnVisibilityChange: setColumnVisibility,
     getSubRows: (row: StudentWithTrackSlot) => {
       if (row.students) {
-        console.log("students", row.students);
         return row.students;
       }
       return [];
     },
   });
-
-  console.log("table", table.getRowModel());
 
   return (
     <div className={trackTableStyles.table_container_tracks}>

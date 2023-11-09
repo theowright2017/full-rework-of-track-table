@@ -13,9 +13,12 @@ const tracks = trackGenerator;
 
 export default function Home() {
   const serialTracks = tracks.map((track) => serialTrackGenerator(track));
+  const allTracksinMap = new Map(
+    serialTracks.map((track, index) => [track.id, track])
+  );
 
   // console.log("serial tracks::: ", serialTracks);
-  return <TrackSlotPageView serialTracks={serialTracks} />;
+  return <TrackSlotPageView allTracksinMap={allTracksinMap} />;
 }
 
 /*

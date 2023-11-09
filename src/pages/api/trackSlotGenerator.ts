@@ -1,7 +1,7 @@
 import { Student } from "./redundant/studentGenerator";
 
 export type StudentWithTrackSlot = {
-  id?: number;
+  id?: string;
   trackSlotIndex?: number;
   length?: number;
   students?: StudentWithTrackSlot[];
@@ -14,7 +14,7 @@ export type StudentWithTrackSlot = {
 };
 
 const trackSlotGenerator = (
-  studentIds: Array<number | null>,
+  studentIds: Array<string | null>,
   isBreakSlot: boolean,
   listOfAllStudents: Student[],
   trackSlotId: number,
@@ -25,7 +25,7 @@ const trackSlotGenerator = (
   if (!isBreakSlot) {
     studentIds.forEach((id) => {
       const noStudent = {
-        id: 0,
+        id: "0",
         name: "",
         course: "",
         code: "",
@@ -33,7 +33,7 @@ const trackSlotGenerator = (
         noStudent: true,
       };
 
-      const match = listOfAllStudents.find((stu) => stu.id === id);
+      const match = listOfAllStudents.find((stu) => stu.id == id);
 
       if (id === null) {
         students.push(noStudent);
@@ -46,7 +46,7 @@ const trackSlotGenerator = (
   }
 
   return {
-    id: trackSlotId,
+    id: trackSlotId.toString(),
     trackSlotIndex: trackSlotIndex,
     length: isBreakSlot ? 15 : 30,
     students: students,

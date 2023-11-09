@@ -34,8 +34,6 @@ const trackGenerator = () => {
 
     */
 
-  const studentIndexes = studentIndexGenerator(TRACK_LENGTH_MINS);
-
   const tracks = ["13-1", "13-2", "25%", "50%"];
 
   return tracks.map((name, idx): Track => {
@@ -60,7 +58,7 @@ const trackGenerator = () => {
       ///
       planSize: 100,
 
-      studentIndex: studentIndexes,
+      studentIndex: studentIndexGenerator(TRACK_LENGTH_MINS, idx + 1),
       systemAssessmentType: "Serial",
     };
     return track;

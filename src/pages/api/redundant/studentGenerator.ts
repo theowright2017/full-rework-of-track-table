@@ -1,5 +1,5 @@
 export type Student = {
-  id: number;
+  id: string;
   name: string;
   code: string;
   course: string;
@@ -10,9 +10,9 @@ export type Student = {
 const studentListGenerator = (): Student[] => {
   const items = Array.from({ length: 50 }, (_, idx) => idx).map((index) => {
     const student: Student = {
-      id: index,
+      id: index.toString(),
       name: index % 2 === 0 ? "Tom Crawley" : "Ben Kingsley",
-      code: index % 2 === 0 ? "XS123" : "AB5676",
+      code: index.toString(),
       course: index % 2 === 0 ? "Engineering" : "Humanities",
       campus: index % 2 === 0 ? "Bristol" : "Edinburgh",
     };
