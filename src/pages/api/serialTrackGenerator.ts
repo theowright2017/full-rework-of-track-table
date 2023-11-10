@@ -3,6 +3,11 @@ import mainColumnGenerator from "../../components/table/ColumnGenerator";
 import trackGenerator, { Track } from "./redundant/trackGenerator";
 import trackSlotGenerator, { StudentWithTrackSlot } from "./trackSlotGenerator";
 
+// export type TrackSlotAndLength = {
+//   trackSlot: StudentWithTrackSlot;
+//   length: number;
+// };
+
 export type SerialTrack = {
   id: number; //track id
   idCohort: number; // track id
@@ -29,15 +34,17 @@ export type SerialTrack = {
 const serialTrackGenerator = (track: Track): SerialTrack => {
   // return a type SerialTrack that contains track slots derived from the track.studentIndex
 
-  const trackslots = track.studentIndex.map((slotWithStudents, index) => {
-    return trackSlotGenerator(
-      slotWithStudents[0] ? slotWithStudents[0] : [],
-      slotWithStudents[0] === null,
-      studentListGenerator,
-      index,
-      index
-    );
-  });
+  const trackslotsWithLength: StudentWithTrackSlot[] = track.studentIndex.map(
+    (slotWithStudents, index) => {
+      return trackSlotGenerator(
+        slotWithStudents[0] ? slotWithStudents[0] : [],
+        slotWithStudents[0] === null,
+        studentListGenerator,
+        index
+        // index
+      );
+    }
+  );
 
   return {
     id: track.id,
@@ -47,7 +54,7 @@ const serialTrackGenerator = (track: Track): SerialTrack => {
     selected: track.name === "13-1",
     maxLength: track.iSlots,
     duration: track.duration,
-    trackSlots: trackslots,
+    trackSlots: trackslotsWithLength,
     // columnsToShow: mainColumnGenerator,
     // columnsToShow: mainColumnGenerator
   };

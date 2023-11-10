@@ -17,7 +17,6 @@ export default function Home() {
     serialTracks.map((track, index) => [track.id, track])
   );
 
-  // console.log("serial tracks::: ", serialTracks);
   return <TrackSlotPageView allTracksinMap={allTracksinMap} />;
 }
 
