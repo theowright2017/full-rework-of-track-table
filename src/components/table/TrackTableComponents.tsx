@@ -90,7 +90,7 @@ const BreakSlot = ({
   </SemTrackSlotTable.Row>
 );
 
-type DnDRowProps = {
+const DragAndDropRow = (props: {
   children: (
     drop: ConnectDropTarget,
     isOver: boolean,
@@ -106,6 +106,8 @@ type DnDRowProps = {
     trackSlotRowIdx: number;
   };
   item: Row<StudentWithTrackSlot>;
+  dropAnchorItem: Row<StudentWithTrackSlot>;
+  dragItems: (Row<StudentWithTrackSlot> | undefined)[];
   // onDragMove: (item: Row<StudentWithTrackSlot>) => void;
   onDragMove: {
     trackSlotsMap: Map<number, StudentWithTrackSlot>;
@@ -115,11 +117,14 @@ type DnDRowProps = {
     subRowIndex: number;
     trackSlotRowIdx: number;
   };
-};
-const DragAndDropRow = (props: DnDRowProps) => (
-  <DraggableRow item={props.item} onDragMove={props.onDragMove}>
+}) => (
+  <DraggableRow
+    item={props.item}
+    dragItems={props.dragItems}
+    onDragMove={props.onDragMove}
+  >
     {(drag: ConnectDragSource) => (
-      <DroppableRow onDrop={props.onDrop} item={props.item}>
+      <DroppableRow onDrop={props.onDrop} dropAnchorItem={props.dropAnchorItem}>
         {(drop: ConnectDropTarget, isOver: boolean, canDrop: boolean) =>
           props.children(drop, isOver, canDrop, drag)
         }
@@ -128,8 +133,10 @@ const DragAndDropRow = (props: DnDRowProps) => (
   </DraggableRow>
 );
 
-type DragRowProps = {
+const DraggableRow = (props: {
   item: Row<StudentWithTrackSlot>;
+  // multipleItems: (Row<StudentWithTrackSlot> | undefined)[];
+  dragItems: (Row<StudentWithTrackSlot> | undefined)[];
   // onDragMove: (item: Row<StudentWithTrackSlot>) => void;
   onDragMove: {
     trackSlotsMap: Map<number, StudentWithTrackSlot>;
@@ -140,8 +147,8 @@ type DragRowProps = {
     trackSlotRowIdx: number;
   };
   children: (drag: ConnectDragSource) => React.JSX.Element;
-};
-const DraggableRow = (props: DragRowProps) => {
+}) => {
+  //
   function onDragEnd(
     monitor: DropTargetMonitor<Row<StudentWithTrackSlot>, unknown>
   ) {
@@ -181,7 +188,7 @@ const DraggableRow = (props: DragRowProps) => {
 
   return (
     <DraggableItem
-      item={props.item}
+      dragItems={props.dragItems}
       type={TrackDragItemTypes.ITEM}
       copyOrMove={"move"}
       onDragEnd={onDragEnd}
@@ -191,8 +198,8 @@ const DraggableRow = (props: DragRowProps) => {
   );
 };
 
-type DropRowProps = {
-  item: Row<StudentWithTrackSlot>;
+const DroppableRow = (props: {
+  dropAnchorItem: Row<StudentWithTrackSlot>;
   onDrop: {
     trackSlotsMap: Map<number, StudentWithTrackSlot>;
     setTrackSlotSMap: React.Dispatch<
@@ -206,46 +213,92 @@ type DropRowProps = {
     isOver: boolean,
     canDrop: boolean
   ) => React.JSX.Element;
-};
-const DroppableRow = (props: DropRowProps) => {
-  const { addStudentId, deleteStudentId } = useContext(StudentsInTracksContext);
+}) => {
+  const { deleteMultipleIds, addStudentId } = useContext(
+    StudentsInTracksContext
+  );
 
   function onDrop(
     draggedRow: Row<Student | StudentWithTrackSlot>,
-    copyOrMove: string
+    copyOrMove: string,
+    multiRows: Row<Student | StudentWithTrackSlot>[]
   ) {
     const { trackSlotsMap, setTrackSlotSMap, subRowIndex, trackSlotRowIdx } =
       props.onDrop;
-    const { original: item } = draggedRow;
-    const { original: studentWithTrackSlot } = props.item;
-    if (studentWithTrackSlot.code !== "") {
-      deleteStudentId(studentWithTrackSlot.id);
+
+    const existingMap = new Map([...trackSlotsMap]);
+
+    const slotToDropIn = existingMap.get(Number(props.dropAnchorItem.parentId));
+    if (!slotToDropIn?.students) return;
+
+    const subIdxToStartDropFrom = props.dropAnchorItem.index;
+
+    const numRowsThatCanFit =
+      slotToDropIn.students.length - subIdxToStartDropFrom;
+
+    if (numRowsThatCanFit < multiRows.length) {
+      // show alert
+      // need to figure out how to filter excess out
     }
-    addStudentId(item.id);
 
-    const newStudentRowForTrackSlot: StudentWithTrackSlot = {
-      id: item.code,
-      code: item.code,
-      name: item.name,
-      course: item.course,
-      campus: item.campus,
-    };
+    const toRemove: string[] = [];
 
-    const existingSlot = trackSlotsMap.get(trackSlotRowIdx);
+    multiRows.slice(0, numRowsThatCanFit).forEach((draggedRow, idx) => {
+      // console.log("row", draggedRow);
+      const { original: draggedItem } = draggedRow;
 
-    if (existingSlot?.students) {
-      existingSlot.students.splice(subRowIndex, 1, newStudentRowForTrackSlot);
+      const newStudentRowForTrackSlot: StudentWithTrackSlot = {
+        id: draggedItem.code,
+        code: draggedItem.code,
+        name: draggedItem.name,
+        course: draggedItem.course,
+        campus: draggedItem.campus,
+      };
 
-      setTrackSlotSMap(
-        (data) => new Map(data.set(trackSlotRowIdx, existingSlot))
+      const emptyRow: StudentWithTrackSlot = {
+        id: `emptyRow`,
+        code: "",
+        name: "",
+        course: "",
+        campus: "",
+      };
+
+      toRemove.push(
+        slotToDropIn.students?.[subIdxToStartDropFrom + idx].id ?? ""
       );
-    }
+
+      slotToDropIn.students?.splice(
+        subIdxToStartDropFrom + idx,
+        1,
+        newStudentRowForTrackSlot
+      );
+
+      if (copyOrMove === "copy") {
+        //from left
+        addStudentId(draggedRow.id);
+      } else if (copyOrMove === "move") {
+        const slotTakenFrom = existingMap.get(parseInt(draggedRow.parentId!));
+
+        if (!slotTakenFrom) return;
+
+        slotTakenFrom.students?.splice(draggedRow.index, 1, emptyRow);
+
+        existingMap.set(parseInt(draggedRow.parentId!), slotTakenFrom);
+      }
+
+      existingMap.set(trackSlotRowIdx, slotToDropIn);
+    });
+
+    // set main
+    setTrackSlotSMap(() => new Map(existingMap));
+    // set left
+    deleteMultipleIds(toRemove);
   }
 
   return (
     <DroppableItem
       type={TrackDragItemTypes.ITEM}
-      dropSourceItem={props.item}
+      dropSourceItem={props.dropAnchorItem}
       onDrop={onDrop}
     >
       {(drop: ConnectDropTarget, isOver: boolean, canDrop: boolean) =>

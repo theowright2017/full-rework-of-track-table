@@ -16,9 +16,17 @@ export function useStudentsInTracksSet(studentsFromIndex) {
     });
   });
 
+  const deleteMultipleIds = useCallback((ids) => {
+    setStudentsAssignedSet((prev) => {
+      ids.forEach((id) => prev.delete(id));
+      return new Set(prev);
+    });
+  });
+
   return {
     studentsAssignedSet,
     addStudentId,
     deleteStudentId,
+    deleteMultipleIds,
   };
 }

@@ -10,13 +10,14 @@ export const DroppableItem = (props) => {
         props.onDrop(
           draggedItem.item,
           draggedItem.copyOrMove,
-          props.dropSourceItem
+          draggedItem.multipleItems
         );
 
         return {
           draggedItem: draggedItem.item,
           copyOrMove: draggedItem.copyOrMove,
           dropSourceItem: props.dropSourceItem,
+          multipleItems: draggedItem.multipleItems,
         };
       },
       collect: (monitor) => ({

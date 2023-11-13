@@ -164,7 +164,7 @@ const HeaderValue = <T,>({ header }: { header: Header<T, unknown> }) => (
 );
 
 const TableInfo = (props: {
-  children: React.JSX.Element[] | React.JSX.Element;
+  children: React.JSX.Element[] | React.JSX.Element | undefined;
 }) => {
   return (
     <div className={styles.info_container}>

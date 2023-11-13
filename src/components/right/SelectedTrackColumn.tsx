@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Row, Table, flexRender } from "@tanstack/react-table";
 
 import {
@@ -36,7 +36,7 @@ type Props = {
 };
 
 const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
-  console.log("track", selectedTrackCol);
+  // console.log("track", selectedTrackCol);
 
   const selectedColumnSaveContext =
     useContext<ColumnSaveContextType>(ColumnSaveContext);
@@ -56,64 +56,91 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
     number | undefined
   >(undefined);
 
+  const [selectedStudentsSet, setSelectedStudentsSet] = useState<Set<string>>(
+    new Set("")
+  );
+
   selectedColumnSaveContext?.setRetrieve(selectedTrackCol.id, () => {
     return trackSlotsMap;
   });
 
-  // function onDrop(
-  //   draggedRow: Row<Student | StudentWithTrackSlot>,
-  //   copyOrMove: string,
-  //   dropSourceRow: Row<StudentWithTrackSlot>,
-  //   subRowIndex: number,
-  //   trackSlotRowIndex: number
-  // ) {
-  //   const { original: item } = draggedRow;
-  //   const { original: studentWithTrackSlot } = dropSourceRow;
-  //   if (studentWithTrackSlot.code !== "") {
-  //     deleteStudentId(studentWithTrackSlot.id);
-  //   }
-  //   addStudentId(item.id);
+  useEffect(() => {
+    setSelectedStudentsSet(() => new Set());
+  }, [trackSlotsMap]);
 
-  //   const newStudentRowForTrackSlot: StudentWithTrackSlot = {
-  //     id: item.code,
-  //     code: item.code,
-  //     name: item.name,
-  //     course: item.course,
-  //     campus: item.campus,
-  //   };
+  function onStudentSelection(
+    event: React.MouseEvent<HTMLTableRowElement, MouseEvent>,
+    subRow: Row<StudentWithTrackSlot>
+  ) {
+    if (
+      event.shiftKey &&
+      selectedStudentsSet.size &&
+      !selectedStudentsSet.has(subRow.id)
+    ) {
+      const rowsAreAllFromSameTrack =
+        new Set(
+          [...selectedStudentsSet.values(), subRow.id].map(
+            (val) => val.split(".")[0]
+          )
+        ).size === 1;
 
-  //   const existingSlot = trackSlotsMap.get(trackSlotRowIndex);
+      if (!rowsAreAllFromSameTrack) return;
 
-  //   if (existingSlot?.students) {
-  //     existingSlot.students.splice(subRowIndex, 1, newStudentRowForTrackSlot);
+      // get all in between row ids from last selected to current
 
-  //     setTrackSlotSMap(
-  //       (data) => new Map(data.set(trackSlotRowIndex, existingSlot))
-  //     );
-  //   }
-  // }
+      const lastSelected = [...selectedStudentsSet.values()].pop();
+      if (!lastSelected) return;
+      const lastSelectedTrackIdx = parseInt(lastSelected.split(".")[0]);
+      const lastSelectedSubIdx = parseInt(lastSelected.split(".")[1]);
+      const justShiftClickedTrackIdx = parseInt(subRow.id.split(".")[0]);
+      const justShiftClickedSubIdx = parseInt(subRow.id.split(".")[1]);
 
-  // function onRowDraggedToDifferentTrack(
-  //   draggedItem: Row<StudentWithTrackSlot>,
-  //   trackSlotIndex: number,
-  //   subRowIndex: number
-  // ) {
-  //   const existingSlot = trackSlotsMap.get(trackSlotIndex);
+      const newIdsToAddToSet: string[] = [];
 
-  //   if (existingSlot?.students) {
-  //     existingSlot.students.splice(subRowIndex, 1, {
-  //       id: `emptyRow_${subRowIndex}`,
-  //       code: "",
-  //       name: "",
-  //       course: "",
-  //       campus: "",
-  //     });
+      [...trackSlotsMap.values()].forEach((trackSlot, tsIdx) => {
+        if (tsIdx < lastSelectedTrackIdx || tsIdx > justShiftClickedTrackIdx) {
+          return;
+        }
+        if (!trackSlot.students?.length) return; // break
 
-  //     setTrackSlotSMap(
-  //       (data) => new Map(data.set(trackSlotIndex, existingSlot))
-  //     );
-  //   }
-  // }
+        let sliceStart = 0;
+        let sliceEnd = 0;
+
+        if (lastSelectedSubIdx > justShiftClickedSubIdx) {
+          // shift up
+          sliceStart = justShiftClickedSubIdx;
+          sliceEnd = lastSelectedSubIdx;
+        } else if (lastSelectedSubIdx < justShiftClickedSubIdx) {
+          // shift down
+          sliceStart = lastSelectedSubIdx;
+          sliceEnd = justShiftClickedSubIdx;
+        }
+
+        trackSlot.students
+          .slice(sliceStart, sliceEnd + 1)
+          .forEach((_stu, stuIdx) => {
+            newIdsToAddToSet.push(`${tsIdx}.${sliceStart + stuIdx}`);
+          });
+      });
+
+      setSelectedStudentsSet((set) => new Set([...set, ...newIdsToAddToSet]));
+
+      ///
+    } else if (event.ctrlKey) {
+      setSelectedStudentsSet((set) => {
+        if (set.has(subRow.id)) {
+          set.delete(subRow.id);
+          return new Set(set);
+        } else {
+          return new Set(set.add(subRow.id));
+        }
+      });
+    } else if (!event.ctrlKey && !event.shiftKey) {
+      setSelectedStudentsSet(
+        new Set(selectedStudentsSet.has(subRow.id) ? [] : [subRow.id])
+      );
+    }
+  }
 
   function onChange(value: number, trackSlotRowIdx: number) {
     let { ...existingSlot } = trackSlotsMap.get(trackSlotRowIdx);
@@ -149,9 +176,7 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
             .slice(0, trackSlotRowIdx)
             .reduce((total, row) => total + row.original.length!, 0);
 
-          const trackSlotIsSelected =
-            selectedTrackSlot === trackSlotRowIdx &&
-            trackSlotRow.original.students?.length === 0;
+          const trackSlotIsSelected = selectedTrackSlot === trackSlotRowIdx;
 
           return (
             <SemTrackSlotTable.Body key={`rowBody_${trackSlotRow.id}`}>
@@ -165,6 +190,10 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                 />
               ) : (
                 trackSlotRow.subRows?.map((subRow, subRowIndex) => {
+                  const dragMultiple =
+                    selectedStudentsSet.size > 1 &&
+                    selectedStudentsSet.has(subRow.id);
+                  // console.log("drag multple", dragMultiple);
                   return (
                     <DragAndDropRow
                       key={`dragDropRow_${subRow.id}`}
@@ -174,25 +203,27 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                         subRowIndex,
                         trackSlotRowIdx,
                       }}
-                      //   (item, copyOrMove, dropSourceItem) =>
-                      //     onDrop(
-                      //       // item,
-                      //       // copyOrMove,
-                      //       // dropSourceItem,
-                      //       // subRowIndex,
-                      //       // trackSlotRowIdx
-                      //       trackSlotsMap,
-                      //       setTrackSlotSMap
-                      //     ) // need to find drop source
-                      // }
                       item={subRow}
-                      // onDragMove={(item) =>
-                      //   onRowDraggedToDifferentTrack(
-                      //     item,
-                      //     trackSlotRowIdx,
-                      //     subRowIndex
-                      //   )
-                      // }
+                      dropAnchorItem={subRow}
+                      dragItems={
+                        dragMultiple
+                          ? [...selectedStudentsSet.values()].map(
+                              (trackAndSubId) => {
+                                const slotRowIdx = parseInt(
+                                  trackAndSubId.split(".")[0]
+                                );
+                                const subRowIdx = parseInt(
+                                  trackAndSubId.split(".")[1]
+                                );
+                                // const slotRow = trackSlotsMap.get(slotRowIdx);
+                                const slotRow = trackSlotRows[slotRowIdx];
+                                const student = slotRow.subRows[subRowIdx];
+
+                                return student;
+                              }
+                            )
+                          : [subRow]
+                      }
                       onDragMove={{
                         trackSlotsMap,
                         setTrackSlotSMap,
@@ -226,6 +257,8 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                           rowCellColour = "green";
                         } else if (trackSlotIsSelected && isOver && !canDrop) {
                           rowCellColour = "red";
+                        } else if (selectedStudentsSet.has(subRow.id)) {
+                          rowCellColour = "blue";
                         } else {
                           rowCellColour = "#fff";
                         }
@@ -236,7 +269,6 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                         } else {
                           stickyCellColour = "#fff";
                         }
-
                         return (
                           <SemTrackSlotTable.Row
                             key={subRow.id}
@@ -244,6 +276,9 @@ const SelectedTrackColumn = ({ selectedTrackCol, multipleSelected }: Props) => {
                               drop(el), drag(el);
                             }}
                             className={trackStyles.slot_row}
+                            onClick={(event) =>
+                              onStudentSelection(event, subRow)
+                            }
                           >
                             {subRow.getVisibleCells().map((cell, cellIndex) => {
                               switch (true) {
