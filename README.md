@@ -1,4 +1,63 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+<br />
+<div align="center" >
+  
+
+  <h3 align="center">Track Table (Proof of Concept)</h3>
+
+  <p align="center">
+    A full rework of the track table.
+    <br />
+   
+  </p>
+</div>
+
+
+
+
+
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
+
+
+
+
+The existing track table code has rendered this particular feature unmaintainable and very difficult to work with.  It will now benefit greatly from a full rewrite using modern technologies, methods and a more readable and React centric approach.
+
+
+
+
+
+
+
+
+
+### Built With
+
+This project is using the following technologies:
+
+
+- Languages
+  - <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript">Javascript</a>
+  - <a href="https://www.typescriptlang.org/">Typescript</a>
+- Frameworks
+  - <a href="https://nextjs.org/">Next.js</a>
+  - <a href="https://react.dev/">React</a>
+- Libraries
+  - <a href="https://tanstack.com/table/latest">Tanstack (React) Table</a>
+  - <a href="https://tanstack.com/virtual/latest">Tanstack Virtual</a>
+  - <a href="https://react-dnd.github.io/react-dnd/about">React DnD (drag and drop)</a>
+  - <a href="https://www.radix-ui.com/">Radix UI</a>
+
+
+  
+
+
+
+
+
+<!-- GETTING STARTED -->
 
 ## Getting Started
 
@@ -16,25 +75,34 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<!-- USAGE EXAMPLES -->
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- The track table page enables a user to determine how tracks are scheduled and which students are assigned to each track.
 
-## Deploy on Vercel
+- Requirements are as follows:
+   - All available students in left hand table
+   - Track selection column in the center
+   - Assigned students in track tables to the right
+   - Manual Save button and drag/drop delete icon at bottom of center column
+ 
+   - All changes including drag and drop actions need to be manually saved via button
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Code behaviour and points to note:
+  -    Each track needs to maintain state even when not showing.  Tracks are therefore rendered via CSS display once the page is mounted.  A retriever function is then set to each track on mount, and on save pulls the state from each track (via useTrackChanges.js hook).
+  -    Files under folder named 'redundant' are mostly for generating mock code and will be replaced by existing code in app.
+  -    A mixture of Typescript and Javascript is used.  This is mostly to enforce strict typing to use in the external table library (recommended).
+  -    TrackSlotPageView.jsx is intended to be as readable as possible.  Informs the layout of the entire page and feature.
+  -    Each student can only belong to one track at a time (useStudentsInTracksSet.js hook).
+  -    This repository is intended purely as a Proof of Concept and will therefore require further revision (code, styling, etc) during port into the existing codebase.
+ 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  
+
